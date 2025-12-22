@@ -1,0 +1,17 @@
+/**
+ * Domain repository interface for lottery data persistence.
+ * No external dependencies—implementations live in infrastructure.
+ */
+export interface LotteryRecord {
+    readonly id: string;
+    readonly drawDate: string;
+    readonly mainNumbers: number[];
+    readonly bonusNumber?: number;
+}
+export interface ILotteryRepository {
+    /** Load lottery records from persistent storage. */
+    load(): Promise<LotteryRecord[]>;
+    /** Verify integrity (e.g., file hash) and throw if invalid. */
+    verifyIntegrity(): Promise<void>;
+}
+//# sourceMappingURL=ILotteryRepository.d.ts.map

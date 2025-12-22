@@ -1,0 +1,517 @@
+{
+  "game": "Pick 5",
+  "range": [
+    1,
+    50
+  ],
+  "draws": 50,
+  "description": "50 draws with each number 1-50 appearing exactly 5 times. Perfectly uniform distribution for Chi-Square and Entropy ground truth testing.",
+  "distribution_note": "Total selections: 50 draws × 5 numbers = 250. Expected frequency per number: 250 / 50 = 5 (uniform).",
+  "data": [
+    {
+      "drawId": 1,
+      "numbers": [
+        19,
+        23,
+        26,
+        27,
+        36
+      ]
+    },
+    {
+      "drawId": 2,
+      "numbers": [
+        16,
+        21,
+        33,
+        40,
+        47
+      ]
+    },
+    {
+      "drawId": 3,
+      "numbers": [
+        4,
+        8,
+        10,
+        39,
+        50
+      ]
+    },
+    {
+      "drawId": 4,
+      "numbers": [
+        18,
+        28,
+        39,
+        41,
+        49
+      ]
+    },
+    {
+      "drawId": 5,
+      "numbers": [
+        4,
+        29,
+        29,
+        32,
+        45
+      ]
+    },
+    {
+      "drawId": 6,
+      "numbers": [
+        5,
+        7,
+        9,
+        27,
+        31
+      ]
+    },
+    {
+      "drawId": 7,
+      "numbers": [
+        8,
+        17,
+        25,
+        35,
+        43
+      ]
+    },
+    {
+      "drawId": 8,
+      "numbers": [
+        2,
+        16,
+        31,
+        46,
+        49
+      ]
+    },
+    {
+      "drawId": 9,
+      "numbers": [
+        17,
+        21,
+        32,
+        35,
+        36
+      ]
+    },
+    {
+      "drawId": 10,
+      "numbers": [
+        9,
+        26,
+        31,
+        33,
+        49
+      ]
+    },
+    {
+      "drawId": 11,
+      "numbers": [
+        1,
+        14,
+        17,
+        31,
+        32
+      ]
+    },
+    {
+      "drawId": 12,
+      "numbers": [
+        7,
+        10,
+        11,
+        12,
+        15
+      ]
+    },
+    {
+      "drawId": 13,
+      "numbers": [
+        7,
+        17,
+        21,
+        28,
+        41
+      ]
+    },
+    {
+      "drawId": 14,
+      "numbers": [
+        19,
+        21,
+        22,
+        40,
+        41
+      ]
+    },
+    {
+      "drawId": 15,
+      "numbers": [
+        7,
+        11,
+        20,
+        38,
+        42
+      ]
+    },
+    {
+      "drawId": 16,
+      "numbers": [
+        4,
+        25,
+        41,
+        42,
+        47
+      ]
+    },
+    {
+      "drawId": 17,
+      "numbers": [
+        30,
+        33,
+        43,
+        47,
+        48
+      ]
+    },
+    {
+      "drawId": 18,
+      "numbers": [
+        6,
+        20,
+        27,
+        33,
+        36
+      ]
+    },
+    {
+      "drawId": 19,
+      "numbers": [
+        5,
+        5,
+        9,
+        20,
+        48
+      ]
+    },
+    {
+      "drawId": 20,
+      "numbers": [
+        5,
+        19,
+        22,
+        38,
+        41
+      ]
+    },
+    {
+      "drawId": 21,
+      "numbers": [
+        2,
+        12,
+        16,
+        38,
+        50
+      ]
+    },
+    {
+      "drawId": 22,
+      "numbers": [
+        25,
+        34,
+        37,
+        40,
+        45
+      ]
+    },
+    {
+      "drawId": 23,
+      "numbers": [
+        6,
+        8,
+        22,
+        36,
+        50
+      ]
+    },
+    {
+      "drawId": 24,
+      "numbers": [
+        11,
+        12,
+        15,
+        27,
+        27
+      ]
+    },
+    {
+      "drawId": 25,
+      "numbers": [
+        12,
+        23,
+        24,
+        43,
+        45
+      ]
+    },
+    {
+      "drawId": 26,
+      "numbers": [
+        2,
+        14,
+        19,
+        28,
+        49
+      ]
+    },
+    {
+      "drawId": 27,
+      "numbers": [
+        2,
+        9,
+        13,
+        24,
+        45
+      ]
+    },
+    {
+      "drawId": 28,
+      "numbers": [
+        10,
+        22,
+        29,
+        30,
+        32
+      ]
+    },
+    {
+      "drawId": 29,
+      "numbers": [
+        3,
+        4,
+        18,
+        39,
+        46
+      ]
+    },
+    {
+      "drawId": 30,
+      "numbers": [
+        18,
+        25,
+        33,
+        37,
+        46
+      ]
+    },
+    {
+      "drawId": 31,
+      "numbers": [
+        1,
+        17,
+        30,
+        37,
+        50
+      ]
+    },
+    {
+      "drawId": 32,
+      "numbers": [
+        14,
+        16,
+        20,
+        43,
+        49
+      ]
+    },
+    {
+      "drawId": 33,
+      "numbers": [
+        6,
+        15,
+        28,
+        44,
+        48
+      ]
+    },
+    {
+      "drawId": 34,
+      "numbers": [
+        14,
+        22,
+        26,
+        40,
+        47
+      ]
+    },
+    {
+      "drawId": 35,
+      "numbers": [
+        13,
+        15,
+        19,
+        42,
+        46
+      ]
+    },
+    {
+      "drawId": 36,
+      "numbers": [
+        1,
+        8,
+        16,
+        44,
+        45
+      ]
+    },
+    {
+      "drawId": 37,
+      "numbers": [
+        3,
+        9,
+        34,
+        42,
+        47
+      ]
+    },
+    {
+      "drawId": 38,
+      "numbers": [
+        4,
+        11,
+        23,
+        24,
+        31
+      ]
+    },
+    {
+      "drawId": 39,
+      "numbers": [
+        10,
+        13,
+        24,
+        29,
+        43
+      ]
+    },
+    {
+      "drawId": 40,
+      "numbers": [
+        1,
+        2,
+        7,
+        20,
+        37
+      ]
+    },
+    {
+      "drawId": 41,
+      "numbers": [
+        6,
+        18,
+        35,
+        38,
+        44
+      ]
+    },
+    {
+      "drawId": 42,
+      "numbers": [
+        10,
+        30,
+        36,
+        48,
+        50
+      ]
+    },
+    {
+      "drawId": 43,
+      "numbers": [
+        1,
+        23,
+        24,
+        25,
+        28
+      ]
+    },
+    {
+      "drawId": 44,
+      "numbers": [
+        3,
+        12,
+        23,
+        34,
+        44
+      ]
+    },
+    {
+      "drawId": 45,
+      "numbers": [
+        6,
+        15,
+        29,
+        37,
+        44
+      ]
+    },
+    {
+      "drawId": 46,
+      "numbers": [
+        3,
+        13,
+        21,
+        35,
+        39
+      ]
+    },
+    {
+      "drawId": 47,
+      "numbers": [
+        5,
+        13,
+        39,
+        40,
+        42
+      ]
+    },
+    {
+      "drawId": 48,
+      "numbers": [
+        14,
+        18,
+        32,
+        34,
+        48
+      ]
+    },
+    {
+      "drawId": 49,
+      "numbers": [
+        3,
+        8,
+        11,
+        26,
+        34
+      ]
+    },
+    {
+      "drawId": 50,
+      "numbers": [
+        26,
+        30,
+        35,
+        38,
+        46
+      ]
+    }
+  ],
+  "frequency_verification": {
+    "note": "Each number 1-50 should appear exactly 5 times.",
+    "expected_chi_square": "Low (near-zero) since distribution is perfectly uniform.",
+    "expected_entropy": "Maximum entropy for uniform distribution: log2(50) ≈ 5.64 bits"
+  }
+}

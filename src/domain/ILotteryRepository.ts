@@ -15,4 +15,7 @@ export interface ILotteryRepository {
 
   /** Verify integrity (e.g., file hash) and throw if invalid. */
   verifyIntegrity(): Promise<void>
+
+  /** Save lottery records to persistent storage. Returns the SHA-256 hash. */
+  save(records: LotteryRecord[]): Promise<string>
 }

@@ -1,5 +1,5 @@
 import { createReadStream } from 'fs'
-import { readFile } from 'fs/promises'
+import { readFile, writeFile } from 'fs/promises'
 import { createHash } from 'crypto'
 import { parse } from 'csv-parse/sync'
 import type { ILotteryRepository, LotteryRecord } from '../domain/ILotteryRepository'
@@ -93,6 +93,30 @@ export class CsvLotteryRepository implements ILotteryRepository {
 
   /** Return the SHA-256 hash of the last loaded file. */
   getHash(): string {
+    return this.fileHash
+  }
+
+  /**
+   * Save lottery records to CSV file.
+   * Computes and returns the SHA-256 hash of the written content.
+   */
+  async save(records: LotteryRecord[]): Promise<string> {
+    // Build CSV content
+    const header = 'id,drawDate,mainNumbers,bonusNumber\n'
+    const lines = records.map((r) => {
+      const mainStr = r.mainNumbers.join(',')
+      const bonusStr = r.bonusNumber ? r.bonusNumber.toString() : ''
+      return `${r.id},${r.drawDate},"${mainStr}",${bonusStr}`
+    })
+    const content = header + lines.join('\n')
+
+    // Write to file
+    await writeFile(this.filePath, content, 'utf-8')
+
+    // Compute and store hash
+    const buffer = Buffer.from(content, 'utf-8')
+    this.fileHash = await this.computeFileHash(buffer)
+
     return this.fileHash
   }
 }
