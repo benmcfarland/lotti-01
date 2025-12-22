@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CsvLotteryRepository = void 0;
-const fs_1 = require("fs");
 const promises_1 = require("fs/promises");
 const crypto_1 = require("crypto");
 const sync_1 = require("csv-parse/sync");
@@ -78,6 +77,26 @@ class CsvLotteryRepository {
     }
     /** Return the SHA-256 hash of the last loaded file. */
     getHash() {
+        return this.fileHash;
+    }
+    /**
+     * Save lottery records to CSV file.
+     * Computes and returns the SHA-256 hash of the written content.
+     */
+    async save(records) {
+        // Build CSV content
+        const header = 'id,drawDate,mainNumbers,bonusNumber\n';
+        const lines = records.map((r) => {
+            const mainStr = r.mainNumbers.join(',');
+            const bonusStr = r.bonusNumber ? r.bonusNumber.toString() : '';
+            return `${r.id},${r.drawDate},"${mainStr}",${bonusStr}`;
+        });
+        const content = header + lines.join('\n');
+        // Write to file
+        await (0, promises_1.writeFile)(this.filePath, content, 'utf-8');
+        // Compute and store hash
+        const buffer = Buffer.from(content, 'utf-8');
+        this.fileHash = await this.computeFileHash(buffer);
         return this.fileHash;
     }
 }

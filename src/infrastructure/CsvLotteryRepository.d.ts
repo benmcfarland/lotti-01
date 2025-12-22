@@ -33,5 +33,10 @@ export declare class CsvLotteryRepository implements ILotteryRepository {
     load(): Promise<LotteryRecord[]>;
     /** Return the SHA-256 hash of the last loaded file. */
     getHash(): string;
+    /**
+     * Save lottery records to CSV file.
+     * Computes and returns the SHA-256 hash of the written content.
+     */
+    save(records: LotteryRecord[]): Promise<string>;
 }
 //# sourceMappingURL=CsvLotteryRepository.d.ts.map
