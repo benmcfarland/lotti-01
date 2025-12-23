@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/cli/index.js",
+  "bin": {
+    "lotti": "dist/cli/index.js"
+  },
   "scripts": {
     "test": "vitest --run",
     "build": "tsc -p tsconfig.json",

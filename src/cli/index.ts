@@ -5,6 +5,8 @@ import CliTable3 from 'cli-table3'
 import { AnalyzeGame } from '../application/AnalyzeGame'
 import { SimulateStrategy } from '../application/SimulateStrategy'
 import { CsvLotteryRepository } from '../infrastructure/CsvLotteryRepository'
+import { mkdir } from 'fs/promises'
+import { join } from 'path'
 import { TheBalancerStrategy } from '../infrastructure/TheBalancerStrategy'
 import { RandomPickingStrategy } from '../infrastructure/RandomPickingStrategy'
 import { PCG32RandomProvider } from '../infrastructure/PCG32RandomProvider'
@@ -223,6 +225,37 @@ function printResults(report: any): void {
  * Setup CLI commands
  */
 program.name('lotti').description('Lottery Statistical Analysis Tool').version('1.0.0')
+
+program
+  .command('import <filePath> <gameId>')
+  .description('Import draws from a CSV file into the local .lotti store')
+  .action(async (filePath: string, gameId: string) => {
+    try {
+      console.log(`${colors.cyan}Importing ${filePath} as game ${gameId}...${colors.reset}`)
+
+      // Load source draws
+      const sourceRepo = new CsvLotteryRepository(filePath)
+      const records = await sourceRepo.load()
+
+      // Ensure .lotti directory exists
+      const lottiDir = join(process.cwd(), '.lotti')
+      await mkdir(lottiDir, { recursive: true })
+
+      // Save to destination path
+      const destPath = join(lottiDir, `${gameId}.csv`)
+      const destRepo = new CsvLotteryRepository(destPath)
+      const hash = await destRepo.save(records)
+
+      console.log(
+        `${colors.green}✔ Successfully imported ${records.length} draws to ${destPath} (hash: ${hash})${colors.reset}`
+      )
+      process.exit(0)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      console.error(`\n${colors.red}❌ Error: ${message}${colors.reset}\n`)
+      process.exit(1)
+    }
+  })
 
 program
   .command('analyze <gameId>')
