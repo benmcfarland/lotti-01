@@ -3,8 +3,13 @@
 import { program } from 'commander'
 import CliTable3 from 'cli-table3'
 import { AnalyzeGame } from '../application/AnalyzeGame'
+import { SimulateStrategy } from '../application/SimulateStrategy'
 import { CsvLotteryRepository } from '../infrastructure/CsvLotteryRepository'
+import { TheBalancerStrategy } from '../infrastructure/TheBalancerStrategy'
+import { RandomPickingStrategy } from '../infrastructure/RandomPickingStrategy'
+import { PCG32RandomProvider } from '../infrastructure/PCG32RandomProvider'
 import type { GameConfig } from '../domain/interfaces/GameConfig'
+import type { IPickingStrategy } from '../domain/interfaces/IPickingStrategy'
 
 /**
  * Color codes for terminal output
@@ -40,6 +45,106 @@ function getStatusColor(status: string): string {
 function formatNumber(num: number, decimals: number = 4): string {
   return num.toFixed(decimals)
 }
+
+/**
+ * Print a simple progress indicator
+ */
+function printProgress(current: number, total: number, label: string = ''): void {
+  const percent = Math.round((current / total) * 100)
+  const barLength = 30
+  const filled = Math.round((percent / 100) * barLength)
+  const empty = barLength - filled
+  const bar = '█'.repeat(filled) + '░'.repeat(empty)
+  process.stdout.write(`\r  ${label} [${bar}] ${percent}%`)
+}
+
+/**
+ * Print a formatted lottery pick
+ */
+function printPick(
+  mainNumbers: readonly number[],
+  bonusNumbers?: readonly number[],
+): void {
+  console.log('\n' + colors.bold + colors.cyan + '🎰 LOTTERY PICK' + colors.reset)
+  console.log('─'.repeat(50))
+
+  const mainStr = mainNumbers.map((n) => colors.bold + n.toString().padStart(2) + colors.reset).join(' ')
+  console.log(`Main Numbers: ${mainStr}`)
+
+  if (bonusNumbers && bonusNumbers.length > 0) {
+    const bonusStr = bonusNumbers.map((n) => colors.green + n.toString().padStart(2) + colors.reset).join(' ')
+    console.log(`Bonus Numbers: ${bonusStr}`)
+  }
+
+  console.log('─'.repeat(50) + '\n')
+}
+
+/**
+ * Print simulation progress with detailed table
+ */
+function printSimulationResults(report: any): void {
+  console.log('\n' + colors.bold + '=' + '='.repeat(78) + colors.reset)
+  console.log(colors.bold + colors.cyan + 'SIMULATION RESULTS: Strategy vs Random' + colors.reset)
+  console.log(colors.bold + '=' + '='.repeat(78) + colors.reset + '\n')
+
+  // Header info
+  console.log(colors.bold + 'Simulation Parameters:' + colors.reset)
+  console.log(`  Game ID: ${report.gameId}`)
+  console.log(`  Iterations per track: ${report.iterations.toLocaleString()}`)
+  console.log(`  Target numbers: [${report.targetNumbers.join(', ')}]`)
+  if (report.targetBonus) {
+    console.log(`  Target bonus: ${report.targetBonus}`)
+  }
+  console.log()
+
+  // Results table
+  const resultsTable = new CliTable3({
+    head: [
+      colors.bold + 'Metric' + colors.reset,
+      colors.bold + 'Strategy' + colors.reset,
+      colors.bold + 'Random' + colors.reset,
+    ],
+    colWidths: [25, 20, 20],
+  })
+
+  resultsTable.push(
+    ['Matches', report.strategyTrack.matchesCount.toString(), report.randomTrack.matchesCount.toString()],
+    [
+      'Match Rate',
+      (report.strategyTrack.matchRate * 100).toFixed(4) + '%',
+      (report.randomTrack.matchRate * 100).toFixed(4) + '%',
+    ],
+    [
+      'Expected Matches',
+      formatNumber(report.strategyTrack.expectedMatches, 1),
+      formatNumber(report.randomTrack.expectedMatches, 1),
+    ],
+    [
+      'ROI',
+      report.strategyTrack.roi.toFixed(2) + '%',
+      report.randomTrack.roi.toFixed(2) + '%',
+    ],
+  )
+
+  console.log(colors.bold + 'Results:' + colors.reset)
+  console.log(resultsTable.toString())
+
+  // Divergence
+  console.log(colors.bold + '\nDivergence Analysis:' + colors.reset)
+  const divergenceColor =
+    Math.abs(report.divergence) < 5 ? colors.green : Math.abs(report.divergence) < 10 ? colors.yellow : colors.red
+  console.log(`  Divergence: ${divergenceColor}${report.divergence.toFixed(2)}%${colors.reset}`)
+  console.log(`  (Strategy ROI - Random ROI)`)
+
+  // Conclusion
+  console.log(colors.bold + '\nConclusion:' + colors.reset)
+  console.log(`  ${report.conclusion}`)
+  console.log(colors.bold + '=' + '='.repeat(78) + colors.reset + '\n')
+}
+
+/**
+ * Format a number to fixed decimal places
+ */
 
 /**
  * Print analysis results as formatted tables
@@ -180,9 +285,213 @@ program
     }
   })
 
-program.parse(process.argv)
+program
+  .command('pick <gameId>')
+  .description('Generate a lottery pick using a specified strategy')
+  .option(
+    '-s, --strategy <name>',
+    'Picking strategy (balancer, random)',
+    'balancer',
+  )
+  .option(
+    '-c, --config <config>',
+    'Game configuration (pick5, powerball, etc)',
+    'pick5',
+  )
+  .option(
+    '--seed <seed>',
+    'RNG seed for reproducibility',
+    'default-seed',
+  )
+  .action(async (gameId: string, options: any) => {
+    try {
+      // Define game configurations
+      const gameConfigs: { [key: string]: GameConfig } = {
+        pick5: {
+          mainPool: { minNumber: 1, maxNumber: 50, count: 5 },
+        },
+        powerball: {
+          mainPool: { minNumber: 1, maxNumber: 69, count: 5 },
+          bonusPool: { minNumber: 1, maxNumber: 26, count: 1 },
+        },
+        megamillions: {
+          mainPool: { minNumber: 1, maxNumber: 70, count: 5 },
+          bonusPool: { minNumber: 1, maxNumber: 25, count: 1 },
+        },
+      }
+
+      const gameConfig = gameConfigs[options.config]
+      if (!gameConfig) {
+        console.error(`❌ Unknown game configuration: ${options.config}`)
+        console.error(`Available options: ${Object.keys(gameConfigs).join(', ')}`)
+        process.exit(1)
+      }
+
+      // Initialize RNG and strategy
+      const rng = new PCG32RandomProvider()
+      rng.seed(options.seed)
+
+      let strategy: IPickingStrategy
+
+      switch (options.strategy.toLowerCase()) {
+        case 'balancer':
+          strategy = new TheBalancerStrategy(rng)
+          break
+        case 'random':
+          strategy = new RandomPickingStrategy(rng)
+          break
+        default:
+          console.error(`❌ Unknown strategy: ${options.strategy}`)
+          console.error('Available strategies: balancer, random')
+          process.exit(1)
+      }
+
+      // Generate pick
+      console.log(`\n${colors.cyan}Generating pick using ${options.strategy} strategy...${colors.reset}`)
+      const mainPick = await strategy.generateMainPoolPick(gameConfig)
+      const bonusPick = await strategy.generateBonusPoolPick(gameConfig)
+
+      // Display result
+      printPick(mainPick, bonusPick.length > 0 ? bonusPick : undefined)
+      process.exit(0)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      console.error(`\n${colors.red}❌ Error: ${message}${colors.reset}\n`)
+      process.exit(1)
+    }
+  })
+
+program
+  .command('simulate <gameId>')
+  .description('Simulate strategy performance vs random picking (10,000 iterations each)')
+  .option(
+    '-s, --strategy <name>',
+    'Strategy to test (balancer, random)',
+    'balancer',
+  )
+  .option(
+    '-c, --config <config>',
+    'Game configuration (pick5, powerball, etc)',
+    'pick5',
+  )
+  .option(
+    '-t, --target <numbers>',
+    'Target numbers to match (comma-separated)',
+    '1,2,3,4,5',
+  )
+  .option(
+    '-b, --bonus <number>',
+    'Optional bonus number to match',
+  )
+  .option(
+    '-i, --iterations <number>',
+    'Iterations per track',
+    '10000',
+  )
+  .option(
+    '--seed <seed>',
+    'RNG seed for reproducibility',
+    'simulation-seed',
+  )
+  .action(async (gameId: string, options: any) => {
+    try {
+      // Define game configurations
+      const gameConfigs: { [key: string]: GameConfig } = {
+        pick5: {
+          mainPool: { minNumber: 1, maxNumber: 50, count: 5 },
+        },
+        powerball: {
+          mainPool: { minNumber: 1, maxNumber: 69, count: 5 },
+          bonusPool: { minNumber: 1, maxNumber: 26, count: 1 },
+        },
+        megamillions: {
+          mainPool: { minNumber: 1, maxNumber: 70, count: 5 },
+          bonusPool: { minNumber: 1, maxNumber: 25, count: 1 },
+        },
+      }
+
+      const gameConfig = gameConfigs[options.config]
+      if (!gameConfig) {
+        console.error(`❌ Unknown game configuration: ${options.config}`)
+        process.exit(1)
+      }
+
+      // Parse target numbers
+      const targetNumbers = options.target.split(',').map((s: string) => parseInt(s.trim(), 10))
+      const bonusNumber = options.bonus ? parseInt(options.bonus, 10) : undefined
+      const iterations = parseInt(options.iterations, 10)
+
+      // Validate target count
+      if (targetNumbers.length !== gameConfig.mainPool.count) {
+        console.error(
+          `❌ Expected ${gameConfig.mainPool.count} target numbers, got ${targetNumbers.length}`,
+        )
+        process.exit(1)
+      }
+
+      // Initialize RNG and strategy
+      const rng = new PCG32RandomProvider()
+      rng.seed(options.seed)
+
+      let strategy: IPickingStrategy
+
+      switch (options.strategy.toLowerCase()) {
+        case 'balancer':
+          strategy = new TheBalancerStrategy(rng)
+          break
+        case 'random':
+          strategy = new RandomPickingStrategy(rng)
+          break
+        default:
+          console.error(`❌ Unknown strategy: ${options.strategy}`)
+          process.exit(1)
+      }
+
+      // Run simulation with progress bar
+      console.log(
+        `\n${colors.cyan}Running simulation: ${options.strategy} vs random${colors.reset}`,
+      )
+      console.log(`Target: [${targetNumbers.join(', ')}]${bonusNumber ? ` + ${bonusNumber}` : ''}`)
+      console.log(`Iterations: ${iterations.toLocaleString()} per track\n`)
+
+      const simulator = new SimulateStrategy(strategy, rng, gameConfig)
+
+      // Simulate in chunks to show progress
+      const chunkSize = Math.max(100, iterations / 100)
+      let simulatorFinished = false
+
+      // Run simulation in background
+      const simulationPromise = simulator.execute(gameId, targetNumbers, bonusNumber, iterations)
+
+      // Show progress while waiting
+      let progressCount = 0
+      const progressInterval = setInterval(() => {
+        if (simulatorFinished) {
+          clearInterval(progressInterval)
+          return
+        }
+        progressCount += 1
+        printProgress(Math.min(progressCount, 100), 100, 'Simulating')
+      }, 100)
+
+      const report = await simulationPromise
+      simulatorFinished = true
+      clearInterval(progressInterval)
+
+      // Print final progress and results
+      console.log() // New line after progress bar
+      printSimulationResults(report)
+      process.exit(0)
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      console.error(`\n${colors.red}❌ Error: ${message}${colors.reset}\n`)
+      process.exit(1)
+    }
+  })
 
 // Show help if no command provided
 if (!process.argv.slice(2).length) {
   program.outputHelp()
 }
+
+program.parse(process.argv)
