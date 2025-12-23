@@ -10,12 +10,10 @@ describe('Chi-Square Test with Decile Binning', () => {
 
   beforeAll(() => {
     const fixture = JSON.parse(readFileSync('tests/fixtures/synthetic_data.json', 'utf-8'))
-    syntheticDraws = fixture.data.map(
-      (d: { drawId: number; numbers: number[] }) => ({
-        id: `draw-${d.drawId}`,
-        numbers: d.numbers,
-      })
-    )
+    syntheticDraws = fixture.data.map((d: { drawId: number; numbers: number[] }) => ({
+      id: `draw-${d.drawId}`,
+      numbers: d.numbers,
+    }))
     gameConfig = {
       mainPool: { minNumber: 1, maxNumber: 50, count: 5 },
     }
@@ -36,7 +34,7 @@ describe('Chi-Square Test with Decile Binning', () => {
 
     expect(result.binObserved.length).toBe(10)
     expect(result.binExpected.length).toBe(10)
-    expect(result.binObserved.every((v) => typeof v === 'number')).toBe(true)
+    expect(result.binObserved.every(v => typeof v === 'number')).toBe(true)
   })
 
   it('total observed frequencies match total numbers drawn', () => {
@@ -88,7 +86,7 @@ describe('Chi-Square Test with Decile Binning', () => {
     const expectedPerBin = totalObserved / 10
 
     // All bins should have nearly the same expected frequency
-    result.binExpected.forEach((exp) => {
+    result.binExpected.forEach(exp => {
       expect(exp).toBe(expectedPerBin)
     })
   })

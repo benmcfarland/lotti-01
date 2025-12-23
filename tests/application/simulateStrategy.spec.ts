@@ -28,7 +28,12 @@ describe('SimulateStrategy - Dual Track Simulation', () => {
       const targetNumbers = [10, 20, 30, 40, 50]
       const iterations = 100 // Small for testing
 
-      const report = await simulateStrategy.execute('test-sim', targetNumbers, undefined, iterations)
+      const report = await simulateStrategy.execute(
+        'test-sim',
+        targetNumbers,
+        undefined,
+        iterations
+      )
 
       expect(report.gameId).toBe('test-sim')
       expect(report.iterations).toBe(iterations)
@@ -107,12 +112,7 @@ describe('SimulateStrategy - Dual Track Simulation', () => {
       const targetNumbers = [10, 20, 30, 40, 50]
       const targetBonus = 15
 
-      const report = await simulateWithBonus.execute(
-        'bonus-sim',
-        targetNumbers,
-        targetBonus,
-        100,
-      )
+      const report = await simulateWithBonus.execute('bonus-sim', targetNumbers, targetBonus, 100)
 
       expect(report.targetBonus).toBe(15)
       // Bonus matches should be rarer than main-only matches
@@ -135,7 +135,7 @@ describe('SimulateStrategy - Dual Track Simulation', () => {
       const strategyActualMatches = report.strategyTrack.matchesCount
 
       if (strategyActualMatches > 0) {
-        const expectedROI = ((strategyActualMatches / strategyExpectedMatches) - 1) * 100
+        const expectedROI = (strategyActualMatches / strategyExpectedMatches - 1) * 100
         expect(Math.abs(report.strategyTrack.roi - expectedROI)).toBeLessThan(0.01)
       }
     })
@@ -193,7 +193,7 @@ describe('SimulateStrategy - Dual Track Simulation', () => {
       const invalidTargets = [1, 2, 3, 4, 100] // 100 is outside [1, 50]
 
       await expect(
-        simulateStrategy.execute('test-sim', invalidTargets, undefined, 100),
+        simulateStrategy.execute('test-sim', invalidTargets, undefined, 100)
       ).rejects.toThrow(/outside main pool range/)
     })
 
@@ -201,7 +201,7 @@ describe('SimulateStrategy - Dual Track Simulation', () => {
       const wrongCount = [1, 2, 3] // Need 5 for this config
 
       await expect(
-        simulateStrategy.execute('test-sim', wrongCount, undefined, 100),
+        simulateStrategy.execute('test-sim', wrongCount, undefined, 100)
       ).rejects.toThrow(/Expected 5 target numbers/)
     })
 
@@ -218,7 +218,7 @@ describe('SimulateStrategy - Dual Track Simulation', () => {
       const invalidBonus = 50 // Outside [1, 20]
 
       await expect(
-        simulateWithBonus.execute('bonus-sim', targetNumbers, invalidBonus, 100),
+        simulateWithBonus.execute('bonus-sim', targetNumbers, invalidBonus, 100)
       ).rejects.toThrow(/outside bonus pool range/)
     })
   })
@@ -228,7 +228,12 @@ describe('SimulateStrategy - Dual Track Simulation', () => {
       const targetNumbers = [1, 2, 3, 4, 5]
       const iterations = 1000
 
-      const report = await simulateStrategy.execute('test-sim', targetNumbers, undefined, iterations)
+      const report = await simulateStrategy.execute(
+        'test-sim',
+        targetNumbers,
+        undefined,
+        iterations
+      )
 
       // For Pick 5 from [1, 50]: C(50, 5) = 2,118,760
       // Expected matches ≈ iterations / C(50, 5) ≈ 1000 / 2,118,760 ≈ 0.0004-0.5
@@ -250,19 +255,14 @@ describe('SimulateStrategy - Dual Track Simulation', () => {
       const targetNumbers = [20, 25, 30, 35, 40]
 
       // Small sample
-      const smallReport = await simulateStrategy.execute(
-        'small-sim',
-        targetNumbers,
-        undefined,
-        100,
-      )
+      const smallReport = await simulateStrategy.execute('small-sim', targetNumbers, undefined, 100)
 
       // Larger sample
       const largeReport = await simulateStrategy.execute(
         'large-sim',
         targetNumbers,
         undefined,
-        1000,
+        1000
       )
 
       // Larger sample should have smaller relative divergence (more stable)

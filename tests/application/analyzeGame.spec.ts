@@ -15,6 +15,10 @@ class MockLotteryRepository implements ILotteryRepository {
     return this.records
   }
 
+  async save(): Promise<string> {
+    return 'mock-hash'
+  }
+
   async verifyIntegrity(): Promise<void> {
     // No-op for testing
   }
@@ -26,13 +30,11 @@ describe('AnalyzeGame Application Service', () => {
 
   beforeAll(() => {
     const fixture = JSON.parse(readFileSync('tests/fixtures/synthetic_data.json', 'utf-8'))
-    syntheticRecords = fixture.data.map(
-      (d: { drawId: number; numbers: number[] }) => ({
-        id: `draw-${d.drawId}`,
-        drawDate: '2024-01-01',
-        mainNumbers: d.numbers,
-      })
-    )
+    syntheticRecords = fixture.data.map((d: { drawId: number; numbers: number[] }) => ({
+      id: `draw-${d.drawId}`,
+      drawDate: '2024-01-01',
+      mainNumbers: d.numbers,
+    }))
     gameConfig = {
       mainPool: { minNumber: 1, maxNumber: 50, count: 5 },
     }

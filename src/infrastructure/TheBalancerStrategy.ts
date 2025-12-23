@@ -60,7 +60,7 @@ export class TheBalancerStrategy implements IPickingStrategy {
     }
 
     throw new Error(
-      `Failed to generate balanced pick for pool [${pool.minNumber}, ${pool.maxNumber}] after ${maxRetries} attempts`,
+      `Failed to generate balanced pick for pool [${pool.minNumber}, ${pool.maxNumber}] after ${maxRetries} attempts`
     )
   }
 
@@ -75,8 +75,8 @@ export class TheBalancerStrategy implements IPickingStrategy {
     // Fisher-Yates shuffle to select first `count` elements
     for (let i = 0; i < count; i++) {
       const j = i + this.rng.nextInt(available.length - i)
-      const temp = available[i]
-      available[i] = available[j]
+      const temp = available[i] as number
+      available[i] = available[j] as number
       available[j] = temp
     }
 

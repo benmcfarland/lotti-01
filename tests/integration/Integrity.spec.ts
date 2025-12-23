@@ -9,7 +9,7 @@ import type { LotteryRecord } from '../../src/domain/ILotteryRepository'
  */
 function createCsvContent(records: LotteryRecord[]): string {
   const header = 'id,drawDate,mainNumbers,bonusNumber\n'
-  const lines = records.map((r) => {
+  const lines = records.map(r => {
     const mainStr = r.mainNumbers.join(',')
     const bonusStr = r.bonusNumber ? r.bonusNumber.toString() : ''
     return `${r.id},${r.drawDate},"${mainStr}",${bonusStr}`
@@ -88,8 +88,8 @@ describe('CSV Repository Integrity Integration Test', () => {
     const loaded = await repo.load()
 
     expect(loaded.length).toBe(3)
-    expect(loaded[0].id).toBe('draw-001')
-    expect(loaded[0].mainNumbers).toEqual([1, 2, 3, 4, 5])
+    expect(loaded[0]?.id).toBe('draw-001')
+    expect(loaded[0]?.mainNumbers).toEqual([1, 2, 3, 4, 5])
   })
 
   it('detects file corruption via SHA-256 mismatch', async () => {

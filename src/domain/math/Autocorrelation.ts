@@ -36,8 +36,8 @@ function pearsonCorrelation(x: number[], y: number[]): number {
   let sumDevY2 = 0
 
   for (let i = 0; i < n; i++) {
-    const devX = x[i] - meanX
-    const devY = y[i] - meanY
+    const devX = (x[i] ?? 0) - meanX
+    const devY = (y[i] ?? 0) - meanY
     sumDevProd += devX * devY
     sumDevX2 += devX * devX
     sumDevY2 += devY * devY
@@ -66,7 +66,7 @@ function correlationPValue(r: number, n: number): number {
   const r2 = r * r
   if (r2 >= 1) return 0
 
-  const t = r * Math.sqrt(n - 2) / Math.sqrt(1 - r2)
+  const t = (r * Math.sqrt(n - 2)) / Math.sqrt(1 - r2)
   const tAbs = Math.abs(t)
 
   // Use normal approximation for t-distribution with df >= 30
@@ -93,7 +93,7 @@ function normalCDF(x: number): number {
   const sign = x < 0 ? -1 : 1
   const absX = Math.abs(x)
   const t = 1 / (1 + p * absX)
-  const y = 1 - (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t) * Math.exp(-absX * absX)
+  const y = 1 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-absX * absX)
 
   return 0.5 * (1 + sign * y)
 }
@@ -123,7 +123,7 @@ export function calculateLag1Autocorrelation(draws: Draw[]): AutocorrelationResu
   }
 
   // Step 1: Calculate sum for each draw
-  const sums = draws.map((draw) => draw.numbers.reduce((a, b) => a + b, 0))
+  const sums = draws.map(draw => draw.numbers.reduce((a, b) => a + b, 0))
 
   // Step 2: Create lagged sequences
   const x = sums.slice(0, -1) // sums[0..n-2]

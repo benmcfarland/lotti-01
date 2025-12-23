@@ -32,7 +32,8 @@ export class BallSet {
     const copy = numbers.slice()
 
     if (copy.length !== poolConfig.count) {
-      throw new Error(`expected ${poolConfig.count} numbers for ${pool} pool`) }
+      throw new Error(`expected ${poolConfig.count} numbers for ${pool} pool`)
+    }
 
     // Ensure integers, uniqueness and range
     const seen = new Set<number>()

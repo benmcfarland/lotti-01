@@ -18,7 +18,10 @@ import { determineStatus, aggregateStatus } from './AnalysisReport'
  * Dependency injection: repository and config are provided by the caller.
  */
 export class AnalyzeGame {
-  constructor(private readonly repository: ILotteryRepository, private readonly gameConfig: GameConfig) {}
+  constructor(
+    private readonly repository: ILotteryRepository,
+    private readonly gameConfig: GameConfig
+  ) {}
 
   /**
    * Execute the analysis workflow.

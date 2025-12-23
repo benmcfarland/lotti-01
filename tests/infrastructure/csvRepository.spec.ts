@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
-import { writeFileSync, unlinkSync } from 'fs'
+import { writeFileSync, unlinkSync, existsSync, mkdirSync } from 'fs'
 import { createHash } from 'crypto'
 import { CsvLotteryRepository } from '../../src/infrastructure/CsvLotteryRepository'
 
@@ -16,11 +16,8 @@ draw-003,2023-02-05,"15,16,17,18,19,20",21`
 
   beforeAll(() => {
     // Create test directory and file
-    try {
-      const fs = require('fs')
-      if (!fs.existsSync(testDir)) fs.mkdirSync(testDir, { recursive: true })
-    } catch (e) {
-      // dir may exist
+    if (!existsSync(testDir)) {
+      mkdirSync(testDir, { recursive: true })
     }
     writeFileSync(testFile, csvContent, 'utf-8')
     csvHash = createHash('sha256').update(csvContent).digest('hex')
@@ -39,9 +36,9 @@ draw-003,2023-02-05,"15,16,17,18,19,20",21`
     const records = await repo.load()
 
     expect(records.length).toBe(3)
-    expect(records[0].id).toBe('draw-001')
-    expect(records[0].drawDate).toBe('2023-01-15')
-    expect(records[0].mainNumbers.length).toBe(6)
+    expect(records[0]?.id).toBe('draw-001')
+    expect(records[0]?.drawDate).toBe('2023-01-15')
+    expect(records[0]?.mainNumbers.length).toBe(6)
   })
 
   it('computes file hash on load', async () => {
@@ -69,7 +66,7 @@ draw-003,2023-02-05,"15,16,17,18,19,20",21`
     const repo = new CsvLotteryRepository(testFile)
     const records = await repo.load()
 
-    expect(records[0].bonusNumber).toBe(7)
-    expect(records[1].bonusNumber).toBe(14)
+    expect(records[0]?.bonusNumber).toBe(7)
+    expect(records[1]?.bonusNumber).toBe(14)
   })
 })

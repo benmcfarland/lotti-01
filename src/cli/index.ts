@@ -61,18 +61,19 @@ function printProgress(current: number, total: number, label: string = ''): void
 /**
  * Print a formatted lottery pick
  */
-function printPick(
-  mainNumbers: readonly number[],
-  bonusNumbers?: readonly number[],
-): void {
+function printPick(mainNumbers: readonly number[], bonusNumbers?: readonly number[]): void {
   console.log('\n' + colors.bold + colors.cyan + '🎰 LOTTERY PICK' + colors.reset)
   console.log('─'.repeat(50))
 
-  const mainStr = mainNumbers.map((n) => colors.bold + n.toString().padStart(2) + colors.reset).join(' ')
+  const mainStr = mainNumbers
+    .map(n => colors.bold + n.toString().padStart(2) + colors.reset)
+    .join(' ')
   console.log(`Main Numbers: ${mainStr}`)
 
   if (bonusNumbers && bonusNumbers.length > 0) {
-    const bonusStr = bonusNumbers.map((n) => colors.green + n.toString().padStart(2) + colors.reset).join(' ')
+    const bonusStr = bonusNumbers
+      .map(n => colors.green + n.toString().padStart(2) + colors.reset)
+      .join(' ')
     console.log(`Bonus Numbers: ${bonusStr}`)
   }
 
@@ -108,7 +109,11 @@ function printSimulationResults(report: any): void {
   })
 
   resultsTable.push(
-    ['Matches', report.strategyTrack.matchesCount.toString(), report.randomTrack.matchesCount.toString()],
+    [
+      'Matches',
+      report.strategyTrack.matchesCount.toString(),
+      report.randomTrack.matchesCount.toString(),
+    ],
     [
       'Match Rate',
       (report.strategyTrack.matchRate * 100).toFixed(4) + '%',
@@ -119,11 +124,7 @@ function printSimulationResults(report: any): void {
       formatNumber(report.strategyTrack.expectedMatches, 1),
       formatNumber(report.randomTrack.expectedMatches, 1),
     ],
-    [
-      'ROI',
-      report.strategyTrack.roi.toFixed(2) + '%',
-      report.randomTrack.roi.toFixed(2) + '%',
-    ],
+    ['ROI', report.strategyTrack.roi.toFixed(2) + '%', report.randomTrack.roi.toFixed(2) + '%']
   )
 
   console.log(colors.bold + 'Results:' + colors.reset)
@@ -132,7 +133,11 @@ function printSimulationResults(report: any): void {
   // Divergence
   console.log(colors.bold + '\nDivergence Analysis:' + colors.reset)
   const divergenceColor =
-    Math.abs(report.divergence) < 5 ? colors.green : Math.abs(report.divergence) < 10 ? colors.yellow : colors.red
+    Math.abs(report.divergence) < 5
+      ? colors.green
+      : Math.abs(report.divergence) < 10
+        ? colors.yellow
+        : colors.red
   console.log(`  Divergence: ${divergenceColor}${report.divergence.toFixed(2)}%${colors.reset}`)
   console.log(`  (Strategy ROI - Random ROI)`)
 
@@ -167,7 +172,7 @@ function printResults(report: any): void {
     [
       'Overall Status',
       getStatusColor(report.overallStatus) + colors.bold + report.overallStatus + colors.reset,
-    ],
+    ]
   )
 
   console.log(headerTable.toString())
@@ -189,11 +194,7 @@ function printResults(report: any): void {
     wordWrap: true,
   })
 
-  const tests = [
-    report.chiSquareTest,
-    report.ksTest,
-    report.autocorrelationTest,
-  ]
+  const tests = [report.chiSquareTest, report.ksTest, report.autocorrelationTest]
 
   for (const test of tests) {
     testTable.push([
@@ -221,24 +222,13 @@ function printResults(report: any): void {
 /**
  * Setup CLI commands
  */
-program
-  .name('lotti')
-  .description('Lottery Statistical Analysis Tool')
-  .version('1.0.0')
+program.name('lotti').description('Lottery Statistical Analysis Tool').version('1.0.0')
 
 program
   .command('analyze <gameId>')
   .description('Analyze lottery draws for statistical randomness')
-  .option(
-    '-f, --file <path>',
-    'Path to CSV file with lottery records',
-    './lottery_data.csv',
-  )
-  .option(
-    '-c, --config <config>',
-    'Game configuration (pick5, powerball, etc)',
-    'pick5',
-  )
+  .option('-f, --file <path>', 'Path to CSV file with lottery records', './lottery_data.csv')
+  .option('-c, --config <config>', 'Game configuration (pick5, powerball, etc)', 'pick5')
   .action(async (gameId: string, options: any) => {
     try {
       // Define game configurations
@@ -258,12 +248,8 @@ program
 
       const gameConfig = gameConfigs[options.config]
       if (!gameConfig) {
-        console.error(
-          `❌ Unknown game configuration: ${options.config}`,
-        )
-        console.error(
-          `Available options: ${Object.keys(gameConfigs).join(', ')}`,
-        )
+        console.error(`❌ Unknown game configuration: ${options.config}`)
+        console.error(`Available options: ${Object.keys(gameConfigs).join(', ')}`)
         process.exit(1)
       }
 
@@ -288,21 +274,9 @@ program
 program
   .command('pick <gameId>')
   .description('Generate a lottery pick using a specified strategy')
-  .option(
-    '-s, --strategy <name>',
-    'Picking strategy (balancer, random)',
-    'balancer',
-  )
-  .option(
-    '-c, --config <config>',
-    'Game configuration (pick5, powerball, etc)',
-    'pick5',
-  )
-  .option(
-    '--seed <seed>',
-    'RNG seed for reproducibility',
-    'default-seed',
-  )
+  .option('-s, --strategy <name>', 'Picking strategy (balancer, random)', 'balancer')
+  .option('-c, --config <config>', 'Game configuration (pick5, powerball, etc)', 'pick5')
+  .option('--seed <seed>', 'RNG seed for reproducibility', 'default-seed')
   .action(async (gameId: string, options: any) => {
     try {
       // Define game configurations
@@ -347,7 +321,9 @@ program
       }
 
       // Generate pick
-      console.log(`\n${colors.cyan}Generating pick using ${options.strategy} strategy...${colors.reset}`)
+      console.log(
+        `\n${colors.cyan}Generating pick using ${options.strategy} strategy...${colors.reset}`
+      )
       const mainPick = await strategy.generateMainPoolPick(gameConfig)
       const bonusPick = await strategy.generateBonusPoolPick(gameConfig)
 
@@ -364,35 +340,12 @@ program
 program
   .command('simulate <gameId>')
   .description('Simulate strategy performance vs random picking (10,000 iterations each)')
-  .option(
-    '-s, --strategy <name>',
-    'Strategy to test (balancer, random)',
-    'balancer',
-  )
-  .option(
-    '-c, --config <config>',
-    'Game configuration (pick5, powerball, etc)',
-    'pick5',
-  )
-  .option(
-    '-t, --target <numbers>',
-    'Target numbers to match (comma-separated)',
-    '1,2,3,4,5',
-  )
-  .option(
-    '-b, --bonus <number>',
-    'Optional bonus number to match',
-  )
-  .option(
-    '-i, --iterations <number>',
-    'Iterations per track',
-    '10000',
-  )
-  .option(
-    '--seed <seed>',
-    'RNG seed for reproducibility',
-    'simulation-seed',
-  )
+  .option('-s, --strategy <name>', 'Strategy to test (balancer, random)', 'balancer')
+  .option('-c, --config <config>', 'Game configuration (pick5, powerball, etc)', 'pick5')
+  .option('-t, --target <numbers>', 'Target numbers to match (comma-separated)', '1,2,3,4,5')
+  .option('-b, --bonus <number>', 'Optional bonus number to match')
+  .option('-i, --iterations <number>', 'Iterations per track', '10000')
+  .option('--seed <seed>', 'RNG seed for reproducibility', 'simulation-seed')
   .action(async (gameId: string, options: any) => {
     try {
       // Define game configurations
@@ -424,7 +377,7 @@ program
       // Validate target count
       if (targetNumbers.length !== gameConfig.mainPool.count) {
         console.error(
-          `❌ Expected ${gameConfig.mainPool.count} target numbers, got ${targetNumbers.length}`,
+          `❌ Expected ${gameConfig.mainPool.count} target numbers, got ${targetNumbers.length}`
         )
         process.exit(1)
       }
@@ -449,7 +402,7 @@ program
 
       // Run simulation with progress bar
       console.log(
-        `\n${colors.cyan}Running simulation: ${options.strategy} vs random${colors.reset}`,
+        `\n${colors.cyan}Running simulation: ${options.strategy} vs random${colors.reset}`
       )
       console.log(`Target: [${targetNumbers.join(', ')}]${bonusNumber ? ` + ${bonusNumber}` : ''}`)
       console.log(`Iterations: ${iterations.toLocaleString()} per track\n`)
@@ -457,7 +410,6 @@ program
       const simulator = new SimulateStrategy(strategy, rng, gameConfig)
 
       // Simulate in chunks to show progress
-      const chunkSize = Math.max(100, iterations / 100)
       let simulatorFinished = false
 
       // Run simulation in background

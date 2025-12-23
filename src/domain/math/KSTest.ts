@@ -30,7 +30,7 @@ function erf(x: number): number {
   x = Math.abs(x)
 
   const t = 1 / (1 + p * x)
-  const y = 1 - (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t) * Math.exp(-x * x)
+  const y = 1 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x)
 
   return sign * y
 }
@@ -49,7 +49,10 @@ function normalCDF(x: number): number {
  * - Mean = (a + b) / 2
  * - Variance = ((b - a + 1)² - 1) / 12
  */
-function calculateTheoretical(poolConfig: PoolConfig, count: number): {
+function calculateTheoretical(
+  poolConfig: PoolConfig,
+  count: number
+): {
   mean: number
   variance: number
   stdDev: number
@@ -97,7 +100,7 @@ export function calculateKSTest(draws: Draw[], config: GameConfig): KSTestResult
   const pool = config.mainPool
 
   // Step 1: Calculate sum for each draw
-  const sums = draws.map((draw) => {
+  const sums = draws.map(draw => {
     const sum = draw.numbers.reduce((acc, num) => acc + num, 0)
     return sum
   })
@@ -122,7 +125,7 @@ export function calculateKSTest(draws: Draw[], config: GameConfig): KSTestResult
     const empiricalCDF = (i + 1) / n
 
     // Theoretical CDF using normal distribution
-    const standardized = (sortedSums[i] - theoretical.mean) / theoretical.stdDev
+    const standardized = ((sortedSums[i] ?? 0) - theoretical.mean) / theoretical.stdDev
     const theoreticalCDF = normalCDF(standardized)
 
     // Track maximum absolute difference

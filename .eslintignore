@@ -1,0 +1,9 @@
+dist/
+node_modules/
+coverage/
+.vitest/
+*.d.ts
+*.js.map
+tests/**/*.js
+src/**/*.js
+examples/**/*.js

@@ -1,1 +1,0 @@
-{"version":3,"file":"IRandomProvider.d.ts","sourceRoot":"","sources":["IRandomProvider.ts"],"names":[],"mappings":"AAAA;;;GAGG;AACH,MAAM,WAAW,eAAe;IAC9B,yEAAyE;IACzE,IAAI,CAAC,IAAI,EAAE,MAAM,GAAG,MAAM,GAAG,IAAI,CAAA;IAEjC;;;OAGG;IACH,OAAO,CAAC,KAAK,CAAC,EAAE,MAAM,GAAG,MAAM,CAAA;CAChC"}

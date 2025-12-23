@@ -1,4 +1,3 @@
-import { createReadStream } from 'fs'
 import { readFile, writeFile } from 'fs/promises'
 import { createHash } from 'crypto'
 import { parse } from 'csv-parse/sync'
@@ -6,7 +5,7 @@ import type { ILotteryRepository, LotteryRecord } from '../domain/ILotteryReposi
 
 /**
  * CSV repository implementation with SHA-256 integrity verification.
- * 
+ *
  * Expected CSV format:
  * id,drawDate,mainNumbers,bonusNumber
  * draw-001,2023-01-15,"1,2,3,4,5,6",7
@@ -14,7 +13,7 @@ import type { ILotteryRepository, LotteryRecord } from '../domain/ILotteryReposi
  */
 export class CsvLotteryRepository implements ILotteryRepository {
   private readonly filePath: string
-  private readonly expectedHash?: string
+  private readonly expectedHash: string | undefined
   private records: LotteryRecord[] = []
   private fileHash: string = ''
 
@@ -74,18 +73,22 @@ export class CsvLotteryRepository implements ILotteryRepository {
       bonusNumber?: string
     }>
 
-    this.records = rows.map((row) => {
+    this.records = rows.map(row => {
       const mainNumbers = row.mainNumbers
         .split(',')
-        .map((n) => parseInt(n.trim(), 10))
-        .filter((n) => !isNaN(n))
+        .map(n => parseInt(n.trim(), 10))
+        .filter(n => !isNaN(n))
 
-      return {
+      const bonusNumber = row.bonusNumber ? parseInt(row.bonusNumber, 10) : undefined
+
+      const record = {
         id: row.id,
         drawDate: row.drawDate,
         mainNumbers,
-        bonusNumber: row.bonusNumber ? parseInt(row.bonusNumber, 10) : undefined,
-      }
+        ...(bonusNumber !== undefined && { bonusNumber }),
+      } as LotteryRecord
+
+      return record
     })
 
     return this.records
@@ -103,7 +106,7 @@ export class CsvLotteryRepository implements ILotteryRepository {
   async save(records: LotteryRecord[]): Promise<string> {
     // Build CSV content
     const header = 'id,drawDate,mainNumbers,bonusNumber\n'
-    const lines = records.map((r) => {
+    const lines = records.map(r => {
       const mainStr = r.mainNumbers.join(',')
       const bonusStr = r.bonusNumber ? r.bonusNumber.toString() : ''
       return `${r.id},${r.drawDate},"${mainStr}",${bonusStr}`

@@ -32,8 +32,8 @@ export class RandomPickingStrategy implements IPickingStrategy {
     // Fisher-Yates shuffle to select first `count` elements
     for (let i = 0; i < count; i++) {
       const j = i + this.rng.nextInt(available.length - i)
-      const temp = available[i]
-      available[i] = available[j]
+      const temp = available[i] as number
+      available[i] = available[j] as number
       available[j] = temp
     }
 

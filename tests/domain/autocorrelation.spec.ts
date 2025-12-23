@@ -8,12 +8,10 @@ describe('Lag-1 Autocorrelation Test for Draw Independence', () => {
 
   beforeAll(() => {
     const fixture = JSON.parse(readFileSync('tests/fixtures/synthetic_data.json', 'utf-8'))
-    syntheticDraws = fixture.data.map(
-      (d: { drawId: number; numbers: number[] }) => ({
-        id: `draw-${d.drawId}`,
-        numbers: d.numbers,
-      })
-    )
+    syntheticDraws = fixture.data.map((d: { drawId: number; numbers: number[] }) => ({
+      id: `draw-${d.drawId}`,
+      numbers: d.numbers,
+    }))
   })
 
   it('calculates Lag-1 autocorrelation on synthetic uniform draws', () => {

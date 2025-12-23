@@ -1,1 +1,0 @@
-{"version":3,"file":"PCG32RandomProvider.d.ts","sourceRoot":"","sources":["PCG32RandomProvider.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,eAAe,EAAE,MAAM,2BAA2B,CAAA;AAEhE;;;;;GAKG;AACH,qBAAa,mBAAoB,YAAW,eAAe;IACzD,OAAO,CAAC,GAAG,CAAc;;IAMzB,IAAI,CAAC,IAAI,EAAE,MAAM,GAAG,MAAM,GAAG,IAAI;IAQjC,OAAO,CAAC,KAAK,CAAC,EAAE,MAAM,GAAG,MAAM;CAOhC"}

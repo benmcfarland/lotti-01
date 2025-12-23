@@ -74,7 +74,7 @@ export function determinePoolStatus(pValues: readonly number[]): AnalysisStatus 
 
   if (minPValue < 0.05) {
     return 'Significant'
-  } else if (minPValue < 0.10) {
+  } else if (minPValue < 0.1) {
     return 'Normal'
   } else {
     return 'Suspicious'
@@ -88,7 +88,7 @@ export function determinePoolStatus(pValues: readonly number[]): AnalysisStatus 
  */
 export function determineOverallStatus(
   mainPoolStatus: AnalysisStatus,
-  bonusPoolStatus: AnalysisStatus,
+  bonusPoolStatus: AnalysisStatus
 ): AnalysisStatus {
   if (mainPoolStatus === 'Significant' || bonusPoolStatus === 'Significant') {
     return 'Significant'

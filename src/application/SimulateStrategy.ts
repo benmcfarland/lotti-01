@@ -50,7 +50,7 @@ export class SimulateStrategy {
   constructor(
     private readonly strategy: IPickingStrategy,
     private readonly rng: IRandomProvider,
-    private readonly gameConfig: GameConfig,
+    private readonly gameConfig: GameConfig
   ) {}
 
   /**
@@ -65,7 +65,7 @@ export class SimulateStrategy {
     gameId: string,
     targetNumbers: readonly number[],
     targetBonus?: number,
-    iterations: number = 10000,
+    iterations: number = 10000
   ): Promise<SimulationReport> {
     // Validate target numbers
     this.validateTargetNumbers(targetNumbers, targetBonus)
@@ -104,7 +104,7 @@ export class SimulateStrategy {
   private async runStrategyTrack(
     iterations: number,
     targetNumbers: readonly number[],
-    targetBonus: number | undefined,
+    targetBonus: number | undefined
   ): Promise<SimulationTrackResult> {
     let matchesCount = 0
 
@@ -137,7 +137,7 @@ export class SimulateStrategy {
   private async runRandomTrack(
     iterations: number,
     targetNumbers: readonly number[],
-    targetBonus: number | undefined,
+    targetBonus: number | undefined
   ): Promise<SimulationTrackResult> {
     const randomStrategy = new RandomPickingStrategy(this.rng)
     let matchesCount = 0
@@ -172,10 +172,10 @@ export class SimulateStrategy {
     mainPick: readonly number[],
     bonusPick: readonly number[],
     targetNumbers: readonly number[],
-    targetBonus: number | undefined,
+    targetBonus: number | undefined
   ): boolean {
     // Check if all target numbers are in the pick
-    const mainMatch = targetNumbers.every((n) => mainPick.includes(n))
+    const mainMatch = targetNumbers.every(n => mainPick.includes(n))
 
     // If bonus expected, check it matches
     if (targetBonus !== undefined) {
@@ -192,7 +192,7 @@ export class SimulateStrategy {
   private calculateExpectedMatches(
     iterations: number,
     targetNumbers: readonly number[],
-    targetBonus: number | undefined,
+    targetBonus: number | undefined
   ): number {
     const mainPool = this.gameConfig.mainPool
     const bonusPool = this.gameConfig.bonusPool
@@ -233,22 +233,20 @@ export class SimulateStrategy {
     for (const num of targetNumbers) {
       if (num < mainPool.minNumber || num > mainPool.maxNumber) {
         throw new Error(
-          `Target number ${num} outside main pool range [${mainPool.minNumber}, ${mainPool.maxNumber}]`,
+          `Target number ${num} outside main pool range [${mainPool.minNumber}, ${mainPool.maxNumber}]`
         )
       }
     }
 
     if (targetNumbers.length !== mainPool.count) {
-      throw new Error(
-        `Expected ${mainPool.count} target numbers, got ${targetNumbers.length}`,
-      )
+      throw new Error(`Expected ${mainPool.count} target numbers, got ${targetNumbers.length}`)
     }
 
     if (targetBonus !== undefined && this.gameConfig.bonusPool) {
       const bonusPool = this.gameConfig.bonusPool
       if (targetBonus < bonusPool.minNumber || targetBonus > bonusPool.maxNumber) {
         throw new Error(
-          `Bonus number ${targetBonus} outside bonus pool range [${bonusPool.minNumber}, ${bonusPool.maxNumber}]`,
+          `Bonus number ${targetBonus} outside bonus pool range [${bonusPool.minNumber}, ${bonusPool.maxNumber}]`
         )
       }
     }
@@ -259,21 +257,27 @@ export class SimulateStrategy {
    */
   private generateConclusion(
     divergence: number,
-    strategyTrack: SimulationTrackResult,
-    randomTrack: SimulationTrackResult,
+    _strategyTrack: SimulationTrackResult,
+    _randomTrack: SimulationTrackResult
   ): string {
     const absDivergence = Math.abs(divergence)
     const threshold = 5 // Allow ±5% divergence due to random variation
 
     if (absDivergence < threshold) {
-      return `Strategy performs identically to random selection (divergence: ${divergence.toFixed(2)}%). ` +
+      return (
+        `Strategy performs identically to random selection (divergence: ${divergence.toFixed(2)}%). ` +
         `Both tracks achieved similar ROI, confirming the strategy provides no statistical advantage.`
+      )
     } else if (divergence > threshold) {
-      return `Strategy outperforms random selection by ${divergence.toFixed(2)}% ROI. ` +
+      return (
+        `Strategy outperforms random selection by ${divergence.toFixed(2)}% ROI. ` +
         `However, verify this exceeds normal statistical variation (${threshold}% threshold).`
+      )
     } else {
-      return `Random selection outperforms strategy by ${Math.abs(divergence).toFixed(2)}% ROI. ` +
+      return (
+        `Random selection outperforms strategy by ${Math.abs(divergence).toFixed(2)}% ROI. ` +
         `Strategy underperformed the baseline, indicating ineffectiveness.`
+      )
     }
   }
 }

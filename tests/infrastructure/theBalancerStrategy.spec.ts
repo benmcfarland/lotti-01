@@ -23,7 +23,7 @@ class MockRNG implements IRandomProvider {
     if (this.index >= this.sequence.length) {
       throw new Error('Mock RNG sequence exhausted')
     }
-    const value = this.sequence[this.index++]
+    const value = this.sequence[this.index++] as number
     return value % (bound || 2147483647)
   }
 }
@@ -40,7 +40,9 @@ describe('TheBalancerStrategy', () => {
   describe('Main Pool Pick Generation', () => {
     it('generates a valid main pool pick with correct count', async () => {
       // Provide enough values for multiple Fisher-Yates iterations and retries
-      const longSequence = Array(300).fill(0).map((_, i) => i)
+      const longSequence = Array(300)
+        .fill(0)
+        .map((_, i) => i)
       rng.setSequence(longSequence)
       const config: GameConfig = {
         mainPool: { minNumber: 1, maxNumber: 50, count: 5 },
@@ -49,13 +51,15 @@ describe('TheBalancerStrategy', () => {
       const pick = await strategy.generateMainPoolPick(config)
 
       expect(pick).toHaveLength(5)
-      expect(pick.every((n) => n >= 1 && n <= 50)).toBe(true)
+      expect(pick.every(n => n >= 1 && n <= 50)).toBe(true)
       // All numbers should be distinct
       expect(new Set(pick).size).toBe(5)
     })
 
     it('pick sum falls within 1.5 standard deviations of mean', async () => {
-      const longSequence = Array(300).fill(0).map((_, i) => i)
+      const longSequence = Array(300)
+        .fill(0)
+        .map((_, i) => i)
       rng.setSequence(longSequence)
       const config: GameConfig = {
         mainPool: { minNumber: 1, maxNumber: 50, count: 5 },
@@ -77,7 +81,9 @@ describe('TheBalancerStrategy', () => {
 
     it('retries until a balanced pick is found', async () => {
       // Sequence that forces some retries: high values first, then low
-      const longSequence = Array(200).fill(0).map((_, i) => i)
+      const longSequence = Array(200)
+        .fill(0)
+        .map((_, i) => i)
       rng.setSequence(longSequence)
 
       const config: GameConfig = {
@@ -86,7 +92,7 @@ describe('TheBalancerStrategy', () => {
 
       const pick = await strategy.generateMainPoolPick(config)
       expect(pick).toHaveLength(2)
-      expect(pick.every((n) => n >= 1 && n <= 10)).toBe(true)
+      expect(pick.every(n => n >= 1 && n <= 10)).toBe(true)
     })
 
     it('throws error when unable to generate balanced pick', async () => {
@@ -112,7 +118,9 @@ describe('TheBalancerStrategy', () => {
     })
 
     it('generates valid bonus pool pick when configured', async () => {
-      const longSequence = Array(100).fill(0).map((_, i) => i)
+      const longSequence = Array(100)
+        .fill(0)
+        .map((_, i) => i)
       rng.setSequence(longSequence)
       const config: GameConfig = {
         mainPool: { minNumber: 1, maxNumber: 50, count: 5 },
@@ -127,7 +135,9 @@ describe('TheBalancerStrategy', () => {
     })
 
     it('bonus pool sum respects balance constraint', async () => {
-      const longSequence = Array(200).fill(0).map((_, i) => i)
+      const longSequence = Array(200)
+        .fill(0)
+        .map((_, i) => i)
       rng.setSequence(longSequence)
       const config: GameConfig = {
         mainPool: { minNumber: 1, maxNumber: 50, count: 5 },
@@ -149,7 +159,9 @@ describe('TheBalancerStrategy', () => {
   describe('Balance Calculation', () => {
     it('correctly calculates theoretical mean', async () => {
       // Pick 5 from [1, 50]: mean = 5 * (1 + 50) / 2 = 127.5
-      const longSequence = Array(300).fill(0).map((_, i) => i)
+      const longSequence = Array(300)
+        .fill(0)
+        .map((_, i) => i)
       rng.setSequence(longSequence)
       const config: GameConfig = {
         mainPool: { minNumber: 1, maxNumber: 50, count: 5 },
@@ -164,7 +176,9 @@ describe('TheBalancerStrategy', () => {
     })
 
     it('handles edge case: small range [1, 2]', async () => {
-      const longSequence = Array(100).fill(0).map((_, i) => i)
+      const longSequence = Array(100)
+        .fill(0)
+        .map((_, i) => i)
       rng.setSequence(longSequence)
 
       const config: GameConfig = {
@@ -174,11 +188,13 @@ describe('TheBalancerStrategy', () => {
       const pick = await strategy.generateMainPoolPick(config)
 
       // Only two numbers available, so pick must be [1, 2]
-      expect(pick.sort()).toEqual([1, 2])
+      expect([...pick].sort((a: number, b: number) => a - b)).toEqual([1, 2])
     })
 
     it('handles large range [1, 1000]', async () => {
-      const longSequence = Array(500).fill(0).map((_, i) => i)
+      const longSequence = Array(500)
+        .fill(0)
+        .map((_, i) => i)
       rng.setSequence(longSequence)
 
       const config: GameConfig = {
@@ -188,7 +204,7 @@ describe('TheBalancerStrategy', () => {
       const pick = await strategy.generateMainPoolPick(config)
 
       expect(pick).toHaveLength(5)
-      expect(pick.every((n) => n >= 1 && n <= 1000)).toBe(true)
+      expect(pick.every(n => n >= 1 && n <= 1000)).toBe(true)
       expect(new Set(pick).size).toBe(5) // All distinct
     })
   })
@@ -196,7 +212,9 @@ describe('TheBalancerStrategy', () => {
   describe('Pick Distinctness', () => {
     it('never generates duplicate numbers in a single pick', async () => {
       for (let attempt = 0; attempt < 5; attempt++) {
-        const longSequence = Array(100).fill(0).map((_, i) => (i + attempt * 13) % 47)
+        const longSequence = Array(100)
+          .fill(0)
+          .map((_, i) => (i + attempt * 13) % 47)
         rng.setSequence(longSequence)
 
         const config: GameConfig = {
@@ -211,7 +229,9 @@ describe('TheBalancerStrategy', () => {
 
   describe('Multiple Pool Configuration', () => {
     it('generates both main and bonus pool picks independently', async () => {
-      const longSequence = Array(200).fill(0).map((_, i) => i)
+      const longSequence = Array(200)
+        .fill(0)
+        .map((_, i) => i)
       rng.setSequence(longSequence)
 
       const config: GameConfig = {
@@ -223,7 +243,7 @@ describe('TheBalancerStrategy', () => {
       const bonusPick = await strategy.generateBonusPoolPick(config)
 
       expect(mainPick).toHaveLength(5)
-      expect(mainPick.every((n) => n >= 1 && n <= 50)).toBe(true)
+      expect(mainPick.every(n => n >= 1 && n <= 50)).toBe(true)
 
       expect(bonusPick).toHaveLength(1)
       expect(bonusPick[0]).toBeGreaterThanOrEqual(1)

@@ -22,7 +22,7 @@ describe('RandomPickingStrategy - Pure Random Selection', () => {
       const pick = await strategy.generateMainPoolPick(config)
 
       expect(pick).toHaveLength(5)
-      expect(pick.every((n) => n >= 1 && n <= 50)).toBe(true)
+      expect(pick.every(n => n >= 1 && n <= 50)).toBe(true)
       expect(new Set(pick).size).toBe(5) // All distinct
     })
 
@@ -36,7 +36,8 @@ describe('RandomPickingStrategy - Pure Random Selection', () => {
       const pick3 = await strategy.generateMainPoolPick(config)
 
       // At least one should be different (very high probability)
-      const allSame = JSON.stringify(pick1) === JSON.stringify(pick2) &&
+      const allSame =
+        JSON.stringify(pick1) === JSON.stringify(pick2) &&
         JSON.stringify(pick2) === JSON.stringify(pick3)
 
       expect(allSame).toBe(false)
@@ -53,7 +54,9 @@ describe('RandomPickingStrategy - Pure Random Selection', () => {
         const pick = await strategy.generateMainPoolPick(config as GameConfig)
 
         expect(pick).toHaveLength(config.mainPool.count)
-        expect(pick.every((n) => n >= config.mainPool.minNumber && n <= config.mainPool.maxNumber)).toBe(true)
+        expect(
+          pick.every(n => n >= config.mainPool.minNumber && n <= config.mainPool.maxNumber)
+        ).toBe(true)
         expect(new Set(pick).size).toBe(pick.length)
       }
     })
@@ -92,7 +95,7 @@ describe('RandomPickingStrategy - Pure Random Selection', () => {
       const bonusPick = await strategy.generateBonusPoolPick(config)
 
       expect(bonusPick).toHaveLength(3)
-      expect(bonusPick.every((n) => n >= 1 && n <= 50)).toBe(true)
+      expect(bonusPick.every(n => n >= 1 && n <= 50)).toBe(true)
       expect(new Set(bonusPick).size).toBe(3) // All distinct
     })
   })
@@ -108,7 +111,7 @@ describe('RandomPickingStrategy - Pure Random Selection', () => {
 
       for (let i = 0; i < iterations; i++) {
         const pick = await strategy.generateMainPoolPick(config)
-        const num = pick[0]
+        const num = pick[0] as number
         frequency[num] = (frequency[num] || 0) + 1
       }
 
@@ -197,7 +200,9 @@ describe('RandomPickingStrategy - Pure Random Selection', () => {
 
       expect(pick).toHaveLength(10)
       expect(new Set(pick).size).toBe(10)
-      expect(pick.sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+      expect([...pick].sort((a: number, b: number) => a - b)).toEqual([
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+      ])
     })
   })
 })

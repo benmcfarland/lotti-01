@@ -33,8 +33,7 @@ describe('BallSet', () => {
 
   it('throws when bonus pool not defined', () => {
     const cfg2: GameConfig = { mainPool: config.mainPool }
-    // @ts-expect-error runtime test: bonus not defined
-    expect(() => new BallSet([1], cfg2, 'bonus')).toThrow()
+    expect(() => new BallSet([7], cfg2 as any, 'bonus')).toThrow()
   })
 
   it('is immutable: toArray returns a copy', () => {

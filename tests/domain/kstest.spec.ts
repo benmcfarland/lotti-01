@@ -10,12 +10,10 @@ describe('Kolmogorov-Smirnov Test for Draw Sums', () => {
 
   beforeAll(() => {
     const fixture = JSON.parse(readFileSync('tests/fixtures/synthetic_data.json', 'utf-8'))
-    syntheticDraws = fixture.data.map(
-      (d: { drawId: number; numbers: number[] }) => ({
-        id: `draw-${d.drawId}`,
-        numbers: d.numbers,
-      })
-    )
+    syntheticDraws = fixture.data.map((d: { drawId: number; numbers: number[] }) => ({
+      id: `draw-${d.drawId}`,
+      numbers: d.numbers,
+    }))
     gameConfig = {
       mainPool: { minNumber: 1, maxNumber: 50, count: 5 },
     }
@@ -33,7 +31,7 @@ describe('Kolmogorov-Smirnov Test for Draw Sums', () => {
     const result = calculateKSTest(syntheticDraws, gameConfig)
 
     expect(result.sums.length).toBe(syntheticDraws.length)
-    expect(result.sums.every((s) => typeof s === 'number')).toBe(true)
+    expect(result.sums.every(s => typeof s === 'number')).toBe(true)
   })
 
   it('calculates empirical mean close to theoretical mean for uniform distribution', () => {
@@ -123,7 +121,7 @@ describe('Kolmogorov-Smirnov Test for Draw Sums', () => {
     // n = 50, variance = ((50+1)(50-1)) / 12 = (51 * 49) / 12 = 2499 / 12 ≈ 208.25
     // Variance of sum of 5: 208.25 * 5 ≈ 1041.25
     // StdDev: √1041.25 ≈ 32.27
-    const expectedVariance = (51 * 49) / 12 * 5
+    const expectedVariance = ((51 * 49) / 12) * 5
     expect(Math.abs(result.theoreticalStdDev ** 2 - expectedVariance)).toBeLessThan(1)
   })
 
